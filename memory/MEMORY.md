@@ -1,0 +1,3 @@
+- [User Profile](user_profile.md) — Vietnamese speaker, works in O'Reilly CloudLabs with GCP
+- [Project CloudLab](project_cloudlab.md) — CloudLabs environment details, gcloud setup info
+- [Use Terraform](feedback_use_terraform.md) — All resources must be created via Terraform, not CLI

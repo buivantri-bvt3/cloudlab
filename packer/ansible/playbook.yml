@@ -1,0 +1,62 @@
+---
+- name: Install Nginx and Ops Agent
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Copy index.html
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: "0644"
+
+    - name: Copy Nginx config
+      ansible.builtin.copy:
+        src: files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable and start Nginx
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: true
+        state: restarted
+
+    - name: Download Ops Agent install script
+      ansible.builtin.get_url:
+        url: https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+        dest: /tmp/add-google-cloud-ops-agent-repo.sh
+        mode: "0755"
+
+    - name: Install Ops Agent
+      ansible.builtin.shell: /tmp/add-google-cloud-ops-agent-repo.sh --also-install
+      args:
+        creates: /usr/bin/google_cloud_ops_agent_engine
+
+    - name: Copy Ops Agent config
+      ansible.builtin.copy:
+        src: files/ops-agent-config.yaml
+        dest: /etc/google-cloud-ops-agent/config.yaml
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable and restart Ops Agent
+      ansible.builtin.systemd:
+        name: google-cloud-ops-agent
+        enabled: true
+        state: restarted

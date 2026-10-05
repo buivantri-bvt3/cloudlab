@@ -1,0 +1,23 @@
+logging:
+  receivers:
+    nginx_access:
+      type: nginx_access
+    nginx_error:
+      type: nginx_error
+  service:
+    pipelines:
+      nginx:
+        receivers:
+          - nginx_access
+          - nginx_error
+
+metrics:
+  receivers:
+    nginx:
+      type: nginx
+      stub_status_url: http://127.0.0.1:80/status
+  service:
+    pipelines:
+      nginx:
+        receivers:
+          - nginx
